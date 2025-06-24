@@ -1,0 +1,605 @@
+{
+	"info": {
+		"_postman_id": "3c9f96d5-1cf8-4e11-b5ec-adfbbb2ba17a",
+		"name": "Giffgaff转eSIM",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "5019143"
+	},
+	"item": [
+		{
+			"name": "1.发送认证邮件 Send Email Verification",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"email_code_ref\", pm.response.json().ref);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"source\": \"esim\",\r\n\t\"preferredChannels\": [\"EMAIL\"]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://id.giffgaff.com/v4/mfa/challenge/me",
+					"protocol": "https",
+					"host": [
+						"id",
+						"giffgaff",
+						"com"
+					],
+					"path": [
+						"v4",
+						"mfa",
+						"challenge",
+						"me"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2.输入邮件验证码 Verify Email code",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"email_signature\", pm.response.json().signature);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"email_code\", pm.request.url.query.get(\"code\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"ref\": \"{{email_code_ref}}\",\r\n\t\"code\": \"{{email_code}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://id.giffgaff.com/v4/mfa/validation?code=159804",
+					"protocol": "https",
+					"host": [
+						"id",
+						"giffgaff",
+						"com"
+					],
+					"path": [
+						"v4",
+						"mfa",
+						"validation"
+					],
+					"query": [
+						{
+							"key": "code",
+							"value": "159804"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3.获取会员ID Get MemberID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"memberId\", pm.response.json().data.memberProfile.id);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"console.log(pm.collectionVariables.get(\"email_signature\"))\r",
+							"if(pm.collectionVariables.get(\"email_signature\")==null || pm.collectionVariables.get(\"email_signature\")== \"\"){\r",
+							"    console.error(\"Email 尚未验证\");\r",
+							"    throw new Error(\"Email 尚未验证\");\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query getMemberProfileAndSim {\r\n  memberProfile {\r\n    id\r\n    memberName\r\n    __typename\r\n  }\r\n  sim {\r\n    phoneNumber\r\n    status\r\n    __typename\r\n  }\r\n}\r\n",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "https://publicapi.giffgaff.com/gateway/graphql",
+					"protocol": "https",
+					"host": [
+						"publicapi",
+						"giffgaff",
+						"com"
+					],
+					"path": [
+						"gateway",
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4.预订eSIM Reserve eSIM",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"esim_ssn\", pm.response.json().data.reserveESim.esim.ssn);\r",
+							"pm.collectionVariables.set(\"esim_activation_code\", pm.response.json().data.reserveESim.esim.activationCode);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-gg-app-os",
+						"value": "iOS",
+						"type": "text"
+					},
+					{
+						"key": "x-gg-app-os-version",
+						"value": "14",
+						"type": "text"
+					},
+					{
+						"key": "x-gg-app-build-number",
+						"value": "722",
+						"type": "text"
+					},
+					{
+						"key": "x-gg-app-device-manufacturer",
+						"value": "apple",
+						"type": "text"
+					},
+					{
+						"key": "x-gg-app-device-model",
+						"value": "iphone15",
+						"type": "text"
+					},
+					{
+						"key": "x-gg-app-version",
+						"value": "13.21.2",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation reserveESim($input: ESimReservationInput!) {\r\n  reserveESim: reserveESim(input: $input) {\r\n    id\r\n    memberId\r\n    reservationStartDate\r\n    reservationEndDate\r\n    status\r\n    esim {\r\n      ssn\r\n      activationCode\r\n      deliveryStatus\r\n      associatedMemberId\r\n      __typename\r\n    }\r\n    __typename\r\n  }\r\n}\r\n",
+						"variables": "{\r\n    \"input\": {\r\n\t\t\"memberId\": \"{{memberId}}\",\r\n\t\t\"userIntent\": \"SWITCH\"\r\n\t}\r\n}"
+					}
+				},
+				"url": {
+					"raw": "https://publicapi.giffgaff.com/gateway/graphql",
+					"protocol": "https",
+					"host": [
+						"publicapi",
+						"giffgaff",
+						"com"
+					],
+					"path": [
+						"gateway",
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "5.执行交换eSIM Swap eSIM",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-gg-app-os",
+						"value": "iOS",
+						"type": "text"
+					},
+					{
+						"key": "x-gg-app-os-version",
+						"value": "14",
+						"type": "text"
+					},
+					{
+						"key": "x-gg-app-build-number",
+						"value": "722",
+						"type": "text"
+					},
+					{
+						"key": "x-gg-app-device-manufacturer",
+						"value": "apple",
+						"type": "text"
+					},
+					{
+						"key": "x-gg-app-device-model",
+						"value": "iphone15",
+						"type": "text"
+					},
+					{
+						"key": "x-gg-app-version",
+						"value": "13.21.2",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation SwapSim($activationCode: String!, $mfaSignature: String!) {\r\n  swapSim(activationCode: $activationCode, mfaSignature: $mfaSignature) {\r\n    old {\r\n      ssn\r\n      activationCode\r\n      __typename\r\n    }\r\n    new {\r\n      ssn\r\n      activationCode\r\n      __typename\r\n    }\r\n    __typename\r\n  }\r\n}\r\n",
+						"variables": "{\r\n\t\"activationCode\": \"{{esim_activation_code}}\",\r\n\t\"mfaSignature\": \"{{email_signature}}\"\r\n}"
+					}
+				},
+				"url": {
+					"raw": "https://publicapi.giffgaff.com/gateway/graphql",
+					"protocol": "https",
+					"host": [
+						"publicapi",
+						"giffgaff",
+						"com"
+					],
+					"path": [
+						"gateway",
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "6.获取eSIM信息 Get eSIM",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-gg-app-os",
+						"value": "iOS",
+						"type": "text"
+					},
+					{
+						"key": "x-gg-app-os-version",
+						"value": "14",
+						"type": "text"
+					},
+					{
+						"key": "x-gg-app-build-number",
+						"value": "722",
+						"type": "text"
+					},
+					{
+						"key": "x-gg-app-device-manufacturer",
+						"value": "apple",
+						"type": "text"
+					},
+					{
+						"key": "x-gg-app-device-model",
+						"value": "iphone15",
+						"type": "text"
+					},
+					{
+						"key": "x-gg-app-version",
+						"value": "13.21.2",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query getESims($deliveryStatus: ESimDeliveryStatus!) {\r\n  eSims(deliveryStatus: $deliveryStatus) {\r\n    ssn\r\n    __typename\r\n  }\r\n}\r\n",
+						"variables": "{\r\n\t\"deliveryStatus\": \"DOWNLOADABLE\"\r\n}"
+					}
+				},
+				"url": {
+					"raw": "https://publicapi.giffgaff.com/gateway/graphql",
+					"protocol": "https",
+					"host": [
+						"publicapi",
+						"giffgaff",
+						"com"
+					],
+					"path": [
+						"gateway",
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "7.获取eSIM下载码 Get eSIM Token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"lpa_string\", pm.response.json().data.eSimDownloadToken.lpaString);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-gg-app-os",
+						"value": "iOS",
+						"type": "text"
+					},
+					{
+						"key": "x-gg-app-os-version",
+						"value": "14",
+						"type": "text"
+					},
+					{
+						"key": "x-gg-app-build-number",
+						"value": "722",
+						"type": "text"
+					},
+					{
+						"key": "x-gg-app-device-manufacturer",
+						"value": "apple",
+						"type": "text"
+					},
+					{
+						"key": "x-gg-app-device-model",
+						"value": "iphone15",
+						"type": "text"
+					},
+					{
+						"key": "x-gg-app-version",
+						"value": "13.21.2",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query eSimDownloadToken($ssn: String!) {\r\n  eSimDownloadToken(ssn: $ssn) {\r\n    id\r\n    host\r\n    matchingId\r\n    lpaString\r\n    __typename\r\n  }\r\n}\r\n",
+						"variables": "{\r\n\t\"ssn\": \"{{esim_ssn}}\"\r\n}"
+					}
+				},
+				"url": {
+					"raw": "https://publicapi.giffgaff.com/gateway/graphql",
+					"protocol": "https",
+					"host": [
+						"publicapi",
+						"giffgaff",
+						"com"
+					],
+					"path": [
+						"gateway",
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "8.生成eSIM二维码 Get eSIM QRCode",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api.qrserver.com/v1/create-qr-code/?data={{lpa_string}}&size=200x200",
+					"protocol": "https",
+					"host": [
+						"api",
+						"qrserver",
+						"com"
+					],
+					"path": [
+						"v1",
+						"create-qr-code",
+						""
+					],
+					"query": [
+						{
+							"key": "data",
+							"value": "{{lpa_string}}"
+						},
+						{
+							"key": "size",
+							"value": "200x200"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "oauth2",
+		"oauth2": [
+			{
+				"key": "refreshRequestParams",
+				"value": [],
+				"type": "any"
+			},
+			{
+				"key": "tokenRequestParams",
+				"value": [],
+				"type": "any"
+			},
+			{
+				"key": "authRequestParams",
+				"value": [],
+				"type": "any"
+			},
+			{
+				"key": "tokenName",
+				"value": "Giffgaff",
+				"type": "string"
+			},
+			{
+				"key": "challengeAlgorithm",
+				"value": "S256",
+				"type": "string"
+			},
+			{
+				"key": "state",
+				"value": "cd34c1ef-f1c7-4d5c-8030-bf9753a2ccd5",
+				"type": "string"
+			},
+			{
+				"key": "scope",
+				"value": "read",
+				"type": "string"
+			},
+			{
+				"key": "redirect_uri",
+				"value": "giffgaff://auth/callback/",
+				"type": "string"
+			},
+			{
+				"key": "grant_type",
+				"value": "authorization_code_with_pkce",
+				"type": "string"
+			},
+			{
+				"key": "clientSecret",
+				"value": "OQv4cfiyol8TvCW4yiLGj0c1AkTR3N2JfRzq7XGqMxk=",
+				"type": "string"
+			},
+			{
+				"key": "clientId",
+				"value": "4a05bf219b3985647d9b9a3ba610a9ce",
+				"type": "string"
+			},
+			{
+				"key": "authUrl",
+				"value": "https://id.giffgaff.com/auth/oauth/authorize",
+				"type": "string"
+			},
+			{
+				"key": "addTokenTo",
+				"value": "header",
+				"type": "string"
+			},
+			{
+				"key": "client_authentication",
+				"value": "header",
+				"type": "string"
+			},
+			{
+				"key": "accessTokenUrl",
+				"value": "https://id.giffgaff.com/auth/oauth/token",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "memberId",
+			"value": ""
+		},
+		{
+			"key": "esim_ssn",
+			"value": ""
+		},
+		{
+			"key": "esim_activation_code",
+			"value": ""
+		},
+		{
+			"key": "email_code_ref",
+			"value": ""
+		},
+		{
+			"key": "email_signature",
+			"value": ""
+		},
+		{
+			"key": "lpa_string",
+			"value": ""
+		},
+		{
+			"key": "email_code",
+			"value": ""
+		}
+	]
+}
