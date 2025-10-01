@@ -1,0 +1,76 @@
+# Source files (TypeScript will be compiled to dist/)
+src/
+
+# Test files
+**/*.test.ts
+**/*.spec.ts
+**/*.test.js
+**/*.spec.js
+**/*.test.d.ts
+**/*.spec.d.ts
+vitest.config.ts
+coverage/
+.nyc_output/
+
+# Config files
+tsconfig.json
+tsconfig.tsbuildinfo
+.eslintrc*
+.prettierrc*
+
+# Development files
+.git/
+.gitignore
+.github/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Documentation and examples
+examples/
+docs/
+*.md
+!README.md
+
+# Build artifacts
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# CI/CD
+.travis.yml
+.gitlab-ci.yml
+.circleci/
+.github/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Package files
+*.tgz
+
+# Development documentation
+CHANGELOG.md
+POSSIBLE_ROADMAP.md
+RELEASE_CHECKLIST.md
+llm-resources/
+.claude/

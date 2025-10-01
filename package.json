@@ -1,0 +1,86 @@
+{
+  "name": "cfai",
+  "version": "0.3.0",
+  "description": "cfai - The easiest CopilotKit integration for Cloudflare Workers AI. Use OpenAI's GPT models on Cloudflare with 93% cost savings.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "copilotkit",
+    "cloudflare",
+    "ai",
+    "workers",
+    "openai",
+    "gpt",
+    "llm",
+    "bridge",
+    "edge",
+    "nextjs",
+    "react",
+    "llama",
+    "workers-ai",
+    "cloudflare-workers"
+  ],
+  "author": {
+    "name": "Audrey Klammer",
+    "email": "contact@audreyklammer.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/klammertime/cfai.git"
+  },
+  "homepage": "https://cfai.dev",
+  "bugs": {
+    "url": "https://github.com/klammertime/cfai/issues"
+  },
+  "scripts": {
+    "build": "npm run clean && tsc --build --force",
+    "dev": "tsc --watch",
+    "prepare": "npm run build",
+    "test": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest watch",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "prepublishOnly": "npm run clean && npm run build && npm run verify",
+    "verify": "node -e \"const fs=require('fs'); if(!fs.existsSync('dist/index.js')) throw new Error('dist/index.js missing! Build failed!')\"",
+    "release": "npm run clean && npm run build && npm run verify && npm pack && npm publish"
+  },
+  "peerDependencies": {
+    "next": ">=13.0.0",
+    "openai": ">=4.0.0"
+  },
+  "optionalDependencies": {
+    "@copilotkit/runtime": ">=1.9.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "@vitest/coverage-v8": "^1.2.0",
+    "eslint": "^8.56.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
