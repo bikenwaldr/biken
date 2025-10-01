@@ -15,7 +15,7 @@ The easiest way to use CopilotKit with Cloudflare Workers AI. Get OpenAI's GPT m
 
 ```bash
 npm install cfai
-# or
+# or 
 yarn add cfai
 # or
 pnpm add cfai
