@@ -8,7 +8,7 @@
 - [ ] Test coverage is acceptable (`npm run test:coverage`)
 - [x] No TypeScript errors (`npm run typecheck`)
 - [ ] No linting errors (`npm run lint`)
-- [x] Code has been reviewed for security vulnerabilities
+- [x] Code has been reviewed for security vulnerabilities 
 - [x] No hardcoded secrets, API keys, or tokens in code
 - [x] All console.log statements removed or behind debug flag
 
